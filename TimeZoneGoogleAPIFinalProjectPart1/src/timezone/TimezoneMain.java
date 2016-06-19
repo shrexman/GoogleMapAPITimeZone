@@ -5,6 +5,11 @@ package timezone;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.function.ToIntBiFunction;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -42,8 +47,21 @@ public class TimezoneMain {
 		final URIBuilder builder = new URIBuilder().setScheme("https").setHost("maps.googleapis.com").setPath("/maps/api/timezone/json");
 		final String loca =  "45.6479343,-74.2722061";
 		
+	/*	DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	       Date dateobj = new Date();
+	       System.out.println(df.format(dateobj));
+
+	       //*getting current date time using calendar class 
+	       // * An Alternative of above*
+	       Calendar calobj = Calendar.getInstance();
+	       System.out.println(df.format(calobj.getTime())); */
+		
+	       int timeStampIntvalue = 1466265003;
+	       String timeStampStringValue = String.valueOf(timeStampIntvalue);
+	       
+	       
 		builder.addParameter("location", loca);
-		builder.addParameter("timestamp", "1466265003");
+		builder.addParameter("timestamp", timeStampStringValue );
 		builder.addParameter("key",TimezoneMain.GOOGLE_API_K);
 		
 		final HttpUriRequest request = new HttpGet(builder.build());
@@ -51,6 +69,18 @@ public class TimezoneMain {
 		final String response = EntityUtils.toString(execute.getEntity());
 		System.out.println(response);
 		
+		JSONObject object = JSONObject.fromObject(response);
+		double IsDaylightSavingTime = object.getInt("dstOffset");
+		if(IsDaylightSavingTime > 0)
+		{
+			IsDaylightSavingTime = IsDaylightSavingTime/60;
+			System.out.println("The locatin is in Day-light Saving Timezone and it is " + IsDaylightSavingTime  + " minutes ahead");
+		}
+		
+		
+		double localTime = 	timeStampIntvalue + object.getInt("dstOffset") + object.getInt("rawOffset");
+		
+		System.out.println("The localtime for current location is : " + localTime);
 		
 		
 	}
