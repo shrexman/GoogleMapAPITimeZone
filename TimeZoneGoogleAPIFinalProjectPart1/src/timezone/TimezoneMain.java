@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.function.ToIntBiFunction;
 
 import net.sf.json.JSONArray;
@@ -56,9 +57,9 @@ public class TimezoneMain {
 	       Calendar calobj = Calendar.getInstance();
 	       System.out.println(df.format(calobj.getTime())); */
 		
-	       int timeStampIntvalue = 1466265003;
+	       long timeStampIntvalue = System.currentTimeMillis()/1000; // Unix time also known as POSIX time or Epoch time
 	       String timeStampStringValue = String.valueOf(timeStampIntvalue);
-	       
+	       //user.getCreatedTime().getTime();
 	       
 		builder.addParameter("location", longitudeLatitude);
 		builder.addParameter("timestamp", timeStampStringValue );
@@ -76,12 +77,20 @@ public class TimezoneMain {
 		
 	}
 	
-	public void calculatingLocalTime(int timeStampIntvalue, JSONObject object) {
-		double localTime = 	(timeStampIntvalue + object.getInt("dstOffset") + object.getInt("rawOffset"));
+	public void calculatingLocalTime(long timeStampIntvalue, JSONObject object) {
 		
-		System.out.println("The Localtime for current location is : " + localTime);
+		long localTime = 	(timeStampIntvalue + object.getInt("dstOffset") + object.getInt("rawOffset"));
+		
+		System.out.println("The Localtime for current location issss : " + localTime);
+		
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    //formatter.setTimeZone(TimeZone.getTimeZone(object.getString("timeZoneName")));
+	    Date date= new Date(localTime);  
+	    String dateString = formatter.format(date);
+	    System.out.println("Converted UTC TIME (using Format method) : "+dateString);
+	    
+	    
 	}
-	
 	public void isLocationDaylightSavingZone(JSONObject object) {
 		double IsDaylightSavingTime = object.getInt("dstOffset");
 		if(IsDaylightSavingTime > 0)
@@ -90,7 +99,4 @@ public class TimezoneMain {
 			System.out.println("The Locatin is in Day-light Saving Timezone and it is " + IsDaylightSavingTime  + " minutes ahead");
 		}
 	}
-
 }
-
-
