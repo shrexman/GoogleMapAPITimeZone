@@ -45,7 +45,7 @@ public class TimezoneMain {
 	private void performSearch(final String location, final String timestamp) throws URISyntaxException, ClientProtocolException, IOException {
 		// TODO Auto-generated method stub
 		final URIBuilder builder = new URIBuilder().setScheme("https").setHost("maps.googleapis.com").setPath("/maps/api/timezone/json");
-		final String loca =  "45.6479343,-74.2722061";
+		final String longitudeLatitude =  "45.6479343,-74.2722061";
 		
 	/*	DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	       Date dateobj = new Date();
@@ -60,7 +60,7 @@ public class TimezoneMain {
 	       String timeStampStringValue = String.valueOf(timeStampIntvalue);
 	       
 	       
-		builder.addParameter("location", loca);
+		builder.addParameter("location", longitudeLatitude);
 		builder.addParameter("timestamp", timeStampStringValue );
 		builder.addParameter("key",TimezoneMain.GOOGLE_API_K);
 		
@@ -70,19 +70,25 @@ public class TimezoneMain {
 		System.out.println(response);
 		
 		JSONObject object = JSONObject.fromObject(response);
+		isLocationDaylightSavingZone(object);
+		
+		calculatingLocalTime(timeStampIntvalue, object);
+		
+	}
+	
+	public void calculatingLocalTime(int timeStampIntvalue, JSONObject object) {
+		double localTime = 	(timeStampIntvalue + object.getInt("dstOffset") + object.getInt("rawOffset"));
+		
+		System.out.println("The Localtime for current location is : " + localTime);
+	}
+	
+	public void isLocationDaylightSavingZone(JSONObject object) {
 		double IsDaylightSavingTime = object.getInt("dstOffset");
 		if(IsDaylightSavingTime > 0)
 		{
 			IsDaylightSavingTime = IsDaylightSavingTime/60;
-			System.out.println("The locatin is in Day-light Saving Timezone and it is " + IsDaylightSavingTime  + " minutes ahead");
+			System.out.println("The Locatin is in Day-light Saving Timezone and it is " + IsDaylightSavingTime  + " minutes ahead");
 		}
-		
-		
-		double localTime = 	timeStampIntvalue + object.getInt("dstOffset") + object.getInt("rawOffset");
-		
-		System.out.println("The localtime for current location is : " + localTime);
-		
-		
 	}
 
 }
